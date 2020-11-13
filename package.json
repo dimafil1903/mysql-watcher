@@ -1,0 +1,36 @@
+{
+  "name": "mysql-watcher",
+  "version": "1.0.0",
+  "dependencies": {
+    "@rodrigogs/mysql-events": "^0.6.0",
+    "@sendgrid/client": "^7.4.0",
+    "@sendgrid/mail": "^7.4.0",
+    "axios": "^0.21.0",
+    "bluebird": "^3.7.2",
+    "body-parser": "^1.19.0",
+    "crypto": "^1.0.1",
+    "express": "^4.17.1",
+    "express-middleware-apikey": "^1.0.2",
+    "express-validator": "^6.6.1",
+    "hat": "0.0.3",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.2.5",
+    "nodemailer": "^6.4.16",
+    "sequelize": "^6.3.5",
+    "sequelize-cli": "^6.2.0",
+    "winston": "^3.3.3"
+  },
+  "scripts": {
+    "server": " node src/server.js ",
+    "index": " node src/index.js",
+    "dev": "export NODE_ENV=development && npm run index",
+    "prod": "export NODE_ENV=production && npm run index",
+    "db:makemigrations": "./node_modules/sequelize-auto-migrations/bin/makemigration.js"
+  },
+  "devDependencies": {
+    "@rodrigogs/mysql-events": "^0.6.0",
+    "hat": "0.0.3",
+    "ora": "^5.1.0",
+    "winston": "^3.3.3"
+  }
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="8b3d441f-fb67-4241-9483-d2bd789dbc7f" name="testMYSQL">
+        <fileTransfer accessType="SFTP" host="3.126.19.29" port="4475" sshConfigId="0f4e80c0-21b4-4d23-b330-2876e561cead" sshConfig="root@3.126.19.29:4475 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
