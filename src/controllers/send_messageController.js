@@ -2,9 +2,7 @@ const helpers = require('../helpers/helpers');
 const {body, query, validationResult} = require('express-validator');
 module.exports = (app, db) => {
 
-
     let route = "/api/message/send"
-
 
     app.post(route, [
             body('type').isIn(["viber", "sms", "email"]),
@@ -30,7 +28,9 @@ module.exports = (app, db) => {
                                 name: req.body.gateway_name
                             }
                         })
-                        message.gateway_id = gateway.id
+                        if (gateway)
+                            message.gateway_id = gateway.id
+                        else return res.status(404).json({errors: [{'msg': "this gateway does not exist"}]});
                     }
                     await createMessage(message, req, res)
 
@@ -40,14 +40,7 @@ module.exports = (app, db) => {
     );
 
     async function createMessage(message, req, res) {
-        const gateway = await db.Gateways.findOne({
-            where: {
-                id: message.gateway_id
-            }
-        })
-        if (!gateway) {
-            return res.status(400).json({errors: [{'msg': "gateway does not exist"}]});
-        }
+
         if (message.type === "sms" || message.type === "viber") {
             let required = checkRequiredOptions(["text", "number"], message)
             message.number = await validate_number(message.number)
@@ -62,18 +55,12 @@ module.exports = (app, db) => {
             const SmsRes = await db.sms.create(message);
             return res.json(SmsRes)
         } else if (message.type === "viber") {
-            message.image = req.body.image
-            message.button_link = req.body.button_link
-            message.button_text = req.body.button_text
-            message.ttl = req.body.ttl
             const viberRes = await db.viber.create(message);
             return res.json(viberRes)
         } else if (message.type === "email") {
             let required = checkRequiredOptions(["emailTo", "title"], message)
             if (required)
                 return res.status(400).json({errors: [{'msg': required + " need to be option of message object "}]});
-
-
             const emailRes = await db.email.create(message);
             return res.json(emailRes)
         } else {
@@ -81,9 +68,7 @@ module.exports = (app, db) => {
             res.send({"status": "error", "err": "type is wrong"})
             return false
         }
-
     }
-
 
     /**
      * @param options array
@@ -91,7 +76,6 @@ module.exports = (app, db) => {
      */
 
     function checkRequiredOptions(options, obj) {
-
         let flag
         options.forEach(element => {
             if (!obj.hasOwnProperty(element)) {
@@ -100,7 +84,6 @@ module.exports = (app, db) => {
             }
             return false
         })
-
         return flag
     }
 

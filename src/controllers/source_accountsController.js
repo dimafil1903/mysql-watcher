@@ -92,14 +92,18 @@ module.exports = (app, db) => {
 
                     }
                 })}
-                db.source_accounts.create({
-                    name: req.body.name,
-                    email: req.body.email,
-                    webhook_url: req.body.webhook_url,
-                    default_gateway_id:gateway.id
-                }).then((result) => res.json(result)).catch(function (err) {
-                    res.send(err.parent.sqlMessage)
-                })
+                if(gateway) {
+                    db.source_accounts.create({
+                        name: req.body.name,
+                        email: req.body.email,
+                        webhook_url: req.body.webhook_url,
+                        default_gateway_id: gateway.id
+                    }).then((result) => res.json(result)).catch(function (err) {
+                        res.send(err.parent.sqlMessage)
+                    })
+                }else {
+                    res.send({"status": "error", "msg": "no gateway with this name"})
+                }
             }
         }
     );

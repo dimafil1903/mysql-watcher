@@ -24,21 +24,28 @@ class intelteleController {
         this.sms.api_key = this.viber.api_key = auth.api_key
     }
 
-    sendViber(image, button_text, button_link, ttl) {
-
-
+    async sendViber(image, button_text, button_link, ttl) {
         this.viber.im_image = image
         this.viber.im_button_text = button_text
         this.viber.im_button_link = button_link
         this.viber.im_ttl = ttl
         console.log(this.viber)
 
-        axios.get('http://api.sms.intel-tele.com/im/send/', this.viber).then((res) =>
-            this.reply = res.data.reply
+        await axios.get('http://api.sms.intel-tele.com/im/send/', this.viber).then((res) => {
+
+                this.reply = res
+                try {
+                    this.message_id = res.data.reply['message_id']
+                } catch (e) {
+                    console.log(e)
+                }
+            console.log(res)
+            }
         ).catch(error => {
-            console.log(error.request.data)
+            this.reply=  error.response.data
         });
 
+        return this.reply
     }
 
     sendSms(priority, system_type) {

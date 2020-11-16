@@ -27,26 +27,30 @@ module.exports = (instance, MySQLEvents) => {
                 })
                 let message = new intele.intelteleController(element.after.number, source_account.name, element.after.text)
                 message.auth(gateway.get("auth"))
-                message.sendViber(element.after.image, element.after.button_text, element.after.button_link, element.after.ttl)
-                await db.vibers.update({message_id: message.message_id}, {
-                    where: {
-                        id: element.after.id
-                    }
-                });
-                if (source_account.webhook_url) {
-                    axios.post(source_account.webhook_url, result).then((res) => {
+                let res = await message.sendViber(element.after.image, element.after.button_text, element.after.button_link, element.after.ttl)
+              console.log(res)
+                if (message.message_id) {
+                    await db.viber.update({message_id: message.message_id}, {
+                        where: {
+                            id: element.after.id
+                        }
+                    });
+
+                    if (source_account.webhook_url) {
+                        axios.post(source_account.webhook_url, this.result).then((res) => {
+                                /**
+                                 * TODO SAVE info about this
+                                 */
+                                console.log(res)
+
+                            }
+                        ).catch(error => {
                             /**
                              * TODO SAVE info about this
                              */
-                            console.log(res)
-
-                        }
-                    ).catch(error => {
-                        /**
-                         * TODO SAVE info about this
-                         */
-                        console.log(error)
-                    });
+                            console.log(error)
+                        });
+                    }
                 }
             })
         }
