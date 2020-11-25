@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="66253a33-9018-4cab-a078-30bef4b0806b" name="bridge" url="http://bridge.dev.smartpointlab.com">
+        <fileTransfer rootFolder="/var/www/bridge.dev.smartpointlab.com" accessType="SFTP" host="3.126.19.29" port="4475" sshConfigId="0f4e80c0-21b4-4d23-b330-2876e561cead" sshConfig="root@3.126.19.29:4475 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>
