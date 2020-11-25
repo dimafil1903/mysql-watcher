@@ -1,4 +1,7 @@
-const smtp=require("../controllers/sendSmtp")
+const smtp = require("../controllers/sendSmtp")
+const sendGrid = require("../controllers/sendGridCotroller")
+const emailExistence = require("email-existence");
+
 const db = require("../models");
 
 module.exports = (instance, MySQLEvents) => {
@@ -11,31 +14,53 @@ module.exports = (instance, MySQLEvents) => {
              *
              *SEND TO GATEWAY
              */
-            e.affectedRows.forEach( async element => {
+            e.affectedRows.forEach(async element => {
                 let source_account = await db.source_accounts.findOne({
                     where: {
                         id: element.after.source_account_id
                     }
                 })
-                console.log(element)
-             let email=new  smtp.sendSmtp()
-                email.send(element.after).then(result => {
-                    if (source_account.webhook_url) {
-                        axios.post(source_account.webhook_url, result).then((res) => {
-                                /**
-                                 * TODO SAVE info about this
-                                 */
-                                console.log(res)
-
-                            }
-                        ).catch(error => {
-                            /**
-                             * TODO SAVE info about this
-                             */
-                            console.log(error)
-                        });
+                let gateway = await db.Gateways.findOne({
+                    where: {
+                        id: element.after.gateway_id
                     }
                 })
+                console.log(element)
+               emailExistence.check(element.after.emailTo, async function (error, response) {
+                    if (response) {
+                        let result
+                        if (gateway.api_name === "send_grid") {
+                            let email = new sendGrid.sendGrid
+                            email.auth(gateway.get('auth'))
+                            result = email.send(element.after)
+                        } else if (gateway.api_name === "smtp") {
+                            let email = new smtp.sendSmtp()
+                            result = await email.send(element.after)
+                        }
+                        console.log(result)
+                        if (result===true) {
+                            db.email.update(
+                                {
+                                    status: "OK"
+                                }, {
+                                    where: {
+                                        id: element.after.id
+                                    }
+                                });
+                        }
+
+                    } else {
+                        db.email.update(
+                            {
+                                status: "rejected"
+                            }, {
+                                where: {
+                                    id: element.after.id
+                                }
+                            });
+                    }
+                });
+
 
                 const errHandler = err => {
                     //Catch and log any error.

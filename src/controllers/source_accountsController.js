@@ -1,5 +1,5 @@
 const helpers = require('../helpers/helpers');
-const {body, query, validationResult} = require('express-validator');
+const { query, validationResult} = require('express-validator');
 
 module.exports = (app, db) => {
 
@@ -75,8 +75,8 @@ module.exports = (app, db) => {
      */
     app.post(single, [
             query('api_key').notEmpty(),
-            body('name').notEmpty(),
-            body('email').notEmpty()
+            query('name').notEmpty(),
+            query('email').notEmpty()
         ], async (req, res) =>  {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -85,18 +85,18 @@ module.exports = (app, db) => {
             if (helpers.check_admin_api_key(req.query, res, db)) {
                 let   gateway
 
-                if (req.body.default_gateway_name){
+                if (req.query.default_gateway_name){
                  gateway = await db.Gateways.findOne({
                     where: {
-                        name: req.body.default_gateway_name
+                        name: req.query.default_gateway_name
 
                     }
                 })}
                 if(gateway) {
                     db.source_accounts.create({
-                        name: req.body.name,
-                        email: req.body.email,
-                        webhook_url: req.body.webhook_url,
+                        name: req.query.name,
+                        email: req.query.email,
+                        webhook_url: req.query.webhook_url,
                         default_gateway_id: gateway.id
                     }).then((result) => res.json(result)).catch(function (err) {
                         res.send(err.parent.sqlMessage)
@@ -112,8 +112,8 @@ module.exports = (app, db) => {
      */
     app.put(single + "/:id", [
             query('api_key').notEmpty(),
-            body('name').notEmpty(),
-            body('email').notEmpty()
+            query('name').notEmpty(),
+            query('email').notEmpty()
         ], (req, res) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -121,9 +121,9 @@ module.exports = (app, db) => {
         }
             if (helpers.check_admin_api_key(req.query, res, db)) {
                 db.source_accounts.update({
-                        name: req.body.name,
-                        email: req.body.email,
-                        webhook_url: req.body.webhook_url
+                        name: req.query.name,
+                        email: req.query.email,
+                        webhook_url: req.query.webhook_url
                     },
                     {
                         where: {

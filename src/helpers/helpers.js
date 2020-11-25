@@ -1,4 +1,5 @@
 const api_keys = require('../config/api_keys');
+const avaliable_api = require('../config/avaliable_api');
 
 module.exports.check_admin_api_key = function check_admin_api_key(query, res, db) {
     if (api_keys().includes(query.api_key))
@@ -6,6 +7,22 @@ module.exports.check_admin_api_key = function check_admin_api_key(query, res, db
     else
         res.send("error api_key")
     return false
+}
+module.exports.check_api_name = function check_api_name(name) {
+    return avaliable_api.hasOwnProperty(name);
+
+}
+module.exports.checkRequiredOptions=function checkRequiredOptions(options, need) {
+   console.log(options,need)
+    let flag
+    need.forEach((key) => {
+        if (!options.includes(key)) {
+
+            return flag = key;
+        }
+        return false
+    })
+    return flag
 }
 module.exports.check_source_accounts_api_key = function check_source_accounts_api_key(query, res, db) {
     return db.source_accounts.findOne({

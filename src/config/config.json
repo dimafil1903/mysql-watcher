@@ -1,4 +1,11 @@
 {
+  "development2": {
+    "username": "rl",
+    "password": "237899AsD",
+    "database": "app_bridge",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
   "development": {
     "username": "root",
     "password": "dimafil1903",

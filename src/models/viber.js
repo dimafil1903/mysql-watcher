@@ -14,13 +14,19 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   viber.init({
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      primaryKey: true
+    },
     number: DataTypes.STRING,
     type: DataTypes.STRING,
     status: DataTypes.STRING,
     source_account_id: DataTypes.INTEGER,
     text:DataTypes.TEXT,
     gateway_id: DataTypes.INTEGER,
-    message_id: DataTypes.INTEGER,
+    message_id: DataTypes.STRING,
     image: DataTypes.TEXT,
     button_link: DataTypes.TEXT,
     button_text: DataTypes.STRING,

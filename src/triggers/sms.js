@@ -23,16 +23,27 @@ module.exports = (instance, MySQLEvents) => {
                         id: element.after.gateway_id
                     }
                 })
-                let message = new intele.intelteleController(element.after.number, source_account.name, element.after.text)
+                let message = new intele.intelteleController()
+                message.createMessage(element.after.number, source_account.name, element.after.text)
                 message.auth(gateway.get("auth"))
-                let result = message.sendSms(element.after.priority, element.after.system_type)
-                await db.sms.update({message_id: message.message_id}, {
-                    where: {
-                        id: element.after.id
-                    }
-                });
+                let result = await message.sendSms(element.after.priority, element.after.system_type)
+                try {
+                    await db.sms.update(
+                        {
+                            message_id: message.message_id,
+                            status:"sent"
+                        }, {
+                        where: {
+                            id: element.after.id
+                        }
+                    });
+                    console.log(result)
+                } catch (e) {
+                    console.log(e)
+                }
+
                 if (source_account.webhook_url) {
-                  await  axios.post(source_account.webhook_url, result).then((res) => {
+                    await axios.post(source_account.webhook_url, result).then((res) => {
                             /**
                              * TODO SAVE info about this
                              */

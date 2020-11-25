@@ -1,3 +1,4 @@
+
 'use strict';
 const {
     Model
@@ -14,16 +15,25 @@ module.exports = (sequelize, DataTypes) => {
         }
     };
     sms.init({
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            allowNull: false,
+            primaryKey: true
+        },
         number: DataTypes.STRING,
         text: DataTypes.TEXT,
+        priority:DataTypes.INTEGER,
+        system_type:DataTypes.STRING,
         source_account_id: DataTypes.INTEGER,
         type: DataTypes.STRING,
         status: DataTypes.STRING,
         gateway_id: DataTypes.INTEGER,
-        message_id: DataTypes.INTEGER
+        message_id: DataTypes.STRING
     }, {
         sequelize,
         modelName: 'sms',
     });
+
     return sms;
 };

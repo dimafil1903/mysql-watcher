@@ -3,8 +3,6 @@ const connection = require("./config/connection.js")
 const  triggers= require("./triggers")
 const ora = require('ora'); // cool spinner
 const server = require("./server")
-
-
 const spinner = ora({
     text: '🛸 Waiting for database events... 🛸 MEMORY USAGE:' + Math.round(process.memoryUsage().heapTotal / 1024 / 1024 * 100) / 100 + "MB",
     color: 'blue',
@@ -19,7 +17,6 @@ const watcher = async () => {
     triggers(instance,MySQLEvents)
     instance.on(MySQLEvents.EVENTS.CONNECTION_ERROR, console.error);
     instance.on(MySQLEvents.EVENTS.ZONGJI_ERROR, console.error);
-
 };
 
 watcher()

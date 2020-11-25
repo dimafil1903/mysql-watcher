@@ -1,37 +1,42 @@
 const sgMail = require('@sendgrid/mail');
+const db = require("../models");
 
-class sendGrid
-{
-    send(message){
-        sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+class sendGrid {
+    mail = sgMail
+    res = undefined
+
+    auth(auth) {
+        this.mail.setApiKey(auth.api_key);
+    }
+
+    async send(message) {
+        const source_account = await db.source_accounts.findOne({
+            where: {
+                id: message.source_account_id
+            }
+        })
         const msg = {
-            to: 'test@example.com',
-            from: 'test@example.com', // Use the email address or domain you verified above
-            subject: 'Sending with Twilio SendGrid is Fun',
-            text: 'and easy to do anywhere, even with Node.js',
-            html: '<strong>and easy to do anywhere, even with Node.js</strong>',
+            to: message.emailTo,
+            from: message.emailFrom || source_account.email, // Use the email address or domain you verified above
+            subject: message.title,
+            text: message.text,
+            html: message.html,
         };
 //ES6
-        sgMail
+        await this.mail
             .send(msg)
-            .then(() => {}, error => {
+            .then((res) => {
+                this.res = res
+            }, error => {
                 console.error(error);
-
+                this.res = error
                 if (error.response) {
                     console.error(error.response.body)
                 }
             });
-//ES8
-        (async () => {
-            try {
-                await sgMail.send(msg);
-            } catch (error) {
-                console.error(error);
 
-                if (error.response) {
-                    console.error(error.response.body)
-                }
-            }
-        })();
+        return this.res
     }
 }
+
+module.exports.sendGrid = sendGrid

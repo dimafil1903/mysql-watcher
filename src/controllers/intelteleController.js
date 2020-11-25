@@ -10,13 +10,14 @@ class intelteleController {
      */
     viber = {}
     sms = {}
+
     reply = undefined
     message_id = undefined
 
-    constructor(number, from, message) {
+    createMessage(number, from, message) {
         this.viber.to = this.sms.to = number;
-        this.sms.to = this.viber.sms_source = this.viber.im_sender = from;
-        this.sms.message = this.viber.im_message = this.viber.sms_message = message;
+        this.sms.from = this.viber.im_sender = from;
+        this.sms.message = this.viber.im_message = message;
     }
 
     auth(auth) {
@@ -31,40 +32,51 @@ class intelteleController {
         this.viber.im_ttl = ttl
         console.log(this.viber)
 
-        await axios.get('http://api.sms.intel-tele.com/im/send/', this.viber).then((res) => {
+        await axios.get('http://api.sms.intel-tele.com/im/send/', {params: this.viber}).then((res) => {
 
-                this.reply = res
+                this.reply = res.data.reply
                 try {
-                    this.message_id = res.data.reply['message_id']
+                    this.message_id = res.data.reply[0].message_id
                 } catch (e) {
-                    console.log(e)
+                    this.reply = e
                 }
-            console.log(res)
+
             }
         ).catch(error => {
-            this.reply=  error.response.data
+            this.reply = error.response.data
         });
 
         return this.reply
     }
 
-    sendSms(priority, system_type) {
+    async sendSms(priority, system_type) {
         this.sms.priority = priority
         this.sms.system_type = system_type
         console.log(this.sms)
 
-        axios.get('http://api.sms.intel-tele.com/message/send/', this.sms).then((res) => {
+
+        await axios.get('http://api.sms.intel-tele.com/message/send/', {params: this.sms}).then((res) => {
                 this.reply = res.data.reply
                 try {
-                    this.message_id = res.data.reply['message_id']
+                    this.message_id = res.data.reply[0].message_id
                 } catch (e) {
                     console.log(e)
                 }
             }
         ).catch(error => {
-            console.log(error)
+            this.reply = error.response.data
         });
         return this.reply
+    }
+
+    async check_status(message_ids) {
+        if (message_ids) {
+            if (message_ids === 'object')
+                message_ids.join(',')
+            this.sms.requests = message_ids
+            await axios.get("http://api.sms.intel-tele.com/message/status/", {params: this.sms})
+        }
+        return false
     }
 
 
